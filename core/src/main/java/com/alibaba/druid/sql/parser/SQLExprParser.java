@@ -1303,7 +1303,7 @@ public class SQLExprParser extends SQLParser {
                 }
                 throw new ParserException("ERROR. " + lexer.info());
             case LBRACKET:
-                if (dbType == DbType.odps || dbType == DbType.clickhouse) {
+                if (dbType == DbType.odps || dbType == DbType.clickhouse || dbType == DbType.starrocks) {
                     SQLArrayExpr array = new SQLArrayExpr();
                     lexer.nextToken();
                     this.exprList(array.getValues(), array);

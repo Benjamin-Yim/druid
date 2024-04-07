@@ -66,9 +66,10 @@ import com.alibaba.druid.sql.dialect.presto.parser.PrestoStatementParser;
 import com.alibaba.druid.sql.dialect.sqlserver.ast.SQLServerSelectQueryBlock;
 import com.alibaba.druid.sql.dialect.sqlserver.parser.SQLServerExprParser;
 import com.alibaba.druid.sql.dialect.sqlserver.parser.SQLServerStatementParser;
-import com.alibaba.druid.sql.dialect.starrocks.parser.StarRocksExprParser;
-import com.alibaba.druid.sql.dialect.starrocks.parser.StarRocksLexer;
-import com.alibaba.druid.sql.dialect.starrocks.parser.StarRocksStatementParser;
+import com.alibaba.druid.sql.dialect.starrocks.ast.StarrocksSelectQueryBlock;
+import com.alibaba.druid.sql.dialect.starrocks.parser.StarrocksExprParser;
+import com.alibaba.druid.sql.dialect.starrocks.parser.StarrocksLexer;
+import com.alibaba.druid.sql.dialect.starrocks.parser.StarrocksStatementParser;
 import com.alibaba.druid.sql.visitor.SQLASTOutputVisitor;
 import com.alibaba.druid.sql.visitor.VisitorFeature;
 import com.alibaba.druid.util.StringUtils;
@@ -142,6 +143,8 @@ public class SQLParserUtils {
                 return new DB2StatementParser(sql, features);
             case odps:
                 return new OdpsStatementParser(sql, features);
+            case starrocks:
+                return new StarrocksStatementParser(sql, features);
             case phoenix:
                 return new PhoenixStatementParser(sql);
             case hive:
@@ -155,8 +158,6 @@ public class SQLParserUtils {
                 return new AntsparkStatementParser(sql);
             case clickhouse:
                 return new ClickhouseStatementParser(sql);
-            case starrocks:
-                return new StarRocksStatementParser(sql);
             default:
                 return new SQLStatementParser(sql, dbType);
         }
@@ -191,6 +192,8 @@ public class SQLParserUtils {
                 return new DB2ExprParser(sql, features);
             case odps:
                 return new OdpsExprParser(sql, features);
+            case starrocks:
+                return new StarrocksExprParser(sql, features);
             case phoenix:
                 return new PhoenixExprParser(sql, features);
             case presto:
@@ -202,8 +205,6 @@ public class SQLParserUtils {
                 return new ClickhouseExprParser(sql, features);
             case oscar:
                 return new OscarExprParser(sql, features);
-            case starrocks:
-                return new StarRocksExprParser(sql, features);
             default:
                 return new SQLExprParser(sql, dbType, features);
         }
@@ -239,6 +240,8 @@ public class SQLParserUtils {
                 return new DB2Lexer(sql, features);
             case odps:
                 return new OdpsLexer(sql, features);
+            case starrocks:
+                return new StarrocksLexer(sql, features);
             case phoenix:
                 return new PhoenixLexer(sql, features);
             case presto:
@@ -250,8 +253,6 @@ public class SQLParserUtils {
                 return new OscarLexer(sql, features);
             case clickhouse:
                 return new ClickhouseLexer(sql, features);
-            case starrocks:
-                return new StarRocksLexer(sql, features);
             default: {
                 Lexer lexer = new Lexer(sql, null, dbType);
                 for (SQLParserFeature feature : features) {
@@ -280,6 +281,8 @@ public class SQLParserUtils {
                 return new PGSelectQueryBlock();
             case odps:
                 return new OdpsSelectQueryBlock();
+            case starrocks:
+                return new StarrocksSelectQueryBlock();
             case sqlserver:
                 return new SQLServerSelectQueryBlock();
             case oscar:

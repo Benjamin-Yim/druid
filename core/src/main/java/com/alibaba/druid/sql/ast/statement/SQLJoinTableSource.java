@@ -276,6 +276,7 @@ public class SQLJoinTableSource extends SQLTableSourceImpl implements SQLReplace
         JOIN("JOIN"),
         INNER_JOIN("INNER JOIN"),
         CROSS_JOIN("CROSS JOIN"),
+        CROSS_JOIN_LATERAL("CROSS JOIN LATERAL"),
         NATURAL_JOIN("NATURAL JOIN"),
         NATURAL_CROSS_JOIN("NATURAL CROSS JOIN"),
         NATURAL_LEFT_JOIN("NATURAL LEFT JOIN"),

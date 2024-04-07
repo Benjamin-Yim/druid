@@ -61,7 +61,9 @@ import com.alibaba.druid.sql.dialect.postgresql.visitor.PGSchemaStatVisitor;
 import com.alibaba.druid.sql.dialect.presto.visitor.PrestoOutputVisitor;
 import com.alibaba.druid.sql.dialect.sqlserver.visitor.SQLServerOutputVisitor;
 import com.alibaba.druid.sql.dialect.sqlserver.visitor.SQLServerSchemaStatVisitor;
-import com.alibaba.druid.sql.dialect.starrocks.visitor.StarRocksOutputVisitor;
+import com.alibaba.druid.sql.dialect.starrocks.ast.StarrocksSelectQueryBlock;
+import com.alibaba.druid.sql.dialect.starrocks.visitor.StarrocksOutputVisitor;
+import com.alibaba.druid.sql.dialect.starrocks.visitor.StarrocksSchemaStatVisitor;
 import com.alibaba.druid.sql.parser.*;
 import com.alibaba.druid.sql.repository.SchemaRepository;
 import com.alibaba.druid.sql.visitor.*;
@@ -167,6 +169,14 @@ public class SQLUtils {
 
     public static String toAntsparkString(SQLObject sqlObject, FormatOption option) {
         return toSQLString(sqlObject, DbType.antspark, option);
+    }
+
+    public static String formatStarrocks(String sql) {
+        return format(sql, DbType.starrocks);
+    }
+
+    public static String formatStarrocks(String sql, FormatOption option) {
+        return format(sql, DbType.starrocks, option);
     }
 
     public static String toMySqlString(SQLObject sqlObject) {
@@ -513,6 +523,8 @@ public class SQLUtils {
                 return new DB2OutputVisitor(out);
             case odps:
                 return new OdpsOutputVisitor(out);
+            case starrocks:
+                return new StarrocksOutputVisitor(out);
             case h2:
                 return new H2OutputVisitor(out);
             case hive:
@@ -529,8 +541,6 @@ public class SQLUtils {
                 return new ClickhouseOutputVisitor(out);
             case oscar:
                 return new OscarOutputVisitor(out);
-            case starrocks:
-                return new StarRocksOutputVisitor(out);
             default:
                 return new SQLASTOutputVisitor(out, dbType);
         }
@@ -577,6 +587,8 @@ public class SQLUtils {
                 return new DB2SchemaStatVisitor(repository);
             case odps:
                 return new OdpsSchemaStatVisitor(repository);
+            case starrocks:
+                return new StarrocksSchemaStatVisitor(repository);
             case h2:
                 return new H2SchemaStatVisitor(repository);
             case hive:
@@ -660,10 +672,10 @@ public class SQLUtils {
     /**
      * Builds a SQL expression to convert a column's value to a date format based on the provided pattern and database type.
      *
-     * @param columnName  the name of the column to be converted
-     * @param tableAlias  the alias of the table containing the column (optional)
-     * @param pattern     the date format pattern to be used for the conversion (optional)
-     * @param dbType      the database type for determining the appropriate conversion function
+     * @param columnName the name of the column to be converted
+     * @param tableAlias the alias of the table containing the column (optional)
+     * @param pattern    the date format pattern to be used for the conversion (optional)
+     * @param dbType     the database type for determining the appropriate conversion function
      * @return a SQL expression representing the converted date value, or an empty string if unable to build the expression
      * @author owenludong.lud
      */
@@ -1706,6 +1718,14 @@ public class SQLUtils {
         SQLSelectItem selectItem = new SQLSelectItem(expr, alias);
         queryBlock.getSelectList().add(selectItem);
         selectItem.setParent(selectItem);
+    }
+
+    public static String toStarrocksString(SQLObject sqlObject) {
+        return toStarrocksString(sqlObject, null);
+    }
+
+    public static String toStarrocksString(SQLObject sqlObject, FormatOption option) {
+        return toSQLString(sqlObject, DbType.starrocks, option);
     }
 
     public static class FormatOption {

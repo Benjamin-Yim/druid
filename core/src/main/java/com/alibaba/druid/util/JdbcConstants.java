@@ -158,4 +158,8 @@ public interface JdbcConstants {
 
     String TAOS_DATA = "com.taosdata.jdbc.TSDBDriver";
     String TAOS_DATA_RS = "com.taosdata.jdbc.rs.RestfulDriver";
+
+    DbType STARROCKS = DbType.starrocks;
+
+    String STARROCKS_DRIVER = "com.mysql.cj.jdbc.Driver";
 }

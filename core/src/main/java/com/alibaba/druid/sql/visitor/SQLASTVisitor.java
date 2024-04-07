@@ -26,7 +26,8 @@ import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlKillStatement;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.SQLAlterResourceGroupStatement;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.SQLCreateResourceGroupStatement;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.SQLListResourceGroupStatement;
-import com.alibaba.druid.sql.dialect.starrocks.ast.statement.StarRocksCreateResourceStatement;
+import com.alibaba.druid.sql.dialect.starrocks.ast.StarrocksCreateTableStatement;
+import com.alibaba.druid.sql.dialect.starrocks.ast.StarrocksInputOutputFormat;
 
 public interface SQLASTVisitor {
     default void endVisit(SQLAllColumnExpr x) {
@@ -2185,6 +2186,20 @@ public interface SQLASTVisitor {
     default void endVisit(HiveInputOutputFormat x) {
     }
 
+    default boolean visit(StarrocksCreateTableStatement x) {
+        return true;
+    }
+
+    default void endVisit(StarrocksCreateTableStatement x) {
+    }
+
+    default boolean visit(StarrocksInputOutputFormat x) {
+        return true;
+    }
+
+    default void endVisit(StarrocksInputOutputFormat x) {
+    }
+
     default boolean visit(SQLExplainAnalyzeStatement x) {
         return true;
     }
@@ -2545,16 +2560,6 @@ public interface SQLASTVisitor {
     }
 
     default void endVisit(SQLUnpivot x) {
-    }
-
-    default void preVisit(StarRocksCreateResourceStatement x) {
-    }
-
-    default boolean visit(StarRocksCreateResourceStatement x) {
-        return true;
-    }
-
-    default void endVisit(StarRocksCreateResourceStatement x) {
     }
 
     default boolean visit(SQLCostStatement x) {

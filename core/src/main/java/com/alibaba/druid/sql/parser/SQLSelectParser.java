@@ -1558,7 +1558,12 @@ public class SQLSelectParser extends SQLParser {
                     lexer.nextToken();
                     if (lexer.token == Token.JOIN) {
                         lexer.nextToken();
-                        joinType = natural ? SQLJoinTableSource.JoinType.NATURAL_CROSS_JOIN : SQLJoinTableSource.JoinType.CROSS_JOIN;
+                        if (dbType == DbType.starrocks && lexer.token == Token.LATERAL) {
+                            lexer.nextToken();
+                            joinType = SQLJoinTableSource.JoinType.CROSS_JOIN_LATERAL;
+                        } else {
+                            joinType = natural ? SQLJoinTableSource.JoinType.NATURAL_CROSS_JOIN : SQLJoinTableSource.JoinType.CROSS_JOIN;
+                        }
                     } else if (lexer.identifierEquals(FnvHash.Constants.APPLY)) {
                         lexer.nextToken();
                         joinType = SQLJoinTableSource.JoinType.CROSS_APPLY;
