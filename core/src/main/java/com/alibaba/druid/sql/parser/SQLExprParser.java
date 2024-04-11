@@ -45,6 +45,9 @@ public class SQLExprParser extends SQLParser {
 
     public static final long[] AGGREGATE_FUNCTIONS_CODES;
 
+    private static String[] STARROCKS_AGG_TYPE = new String[]{"SUM", "MAX", "MIN", "REPLACE", "HLL_UNION", "BITMAP_UNION", "REPLACE_IF_NOT_NULL", "PERCENTILE_UNION"};
+
+
     static {
         String[] strings = {"AVG", "COUNT", "MAX", "MIN", "STDDEV", "SUM"};
         AGGREGATE_FUNCTIONS_CODES = FnvHash.fnv1a_64_lower(strings, true);
@@ -118,7 +121,8 @@ public class SQLExprParser extends SQLParser {
             expr = xorRest(expr);
             expr = orRest(expr);
             return expr;
-        } if (token == Token.IN) {
+        }
+        if (token == Token.IN) {
             lexer.nextToken();
             if (lexer.token == Token.PARTITION) {
                 lexer.reset(mark);
@@ -1883,7 +1887,7 @@ public class SQLExprParser extends SQLParser {
                     //处理类似偏函数的语法 func(x,y)(a,b,c)
                     lexer.nextToken();
                     SQLParametricMethodInvokeExpr parametricExpr =
-                        new SQLParametricMethodInvokeExpr(methodName, hash_lower);
+                            new SQLParametricMethodInvokeExpr(methodName, hash_lower);
                     methodInvokeExpr.cloneTo(parametricExpr);
                     methodInvokeExpr = parametricExpr;
                     exprList(((SQLParametricMethodInvokeExpr) methodInvokeExpr).getSecondArguments(), methodInvokeExpr);
@@ -2378,6 +2382,7 @@ public class SQLExprParser extends SQLParser {
                 case IS:
                 case LOCK:
                 case REFERENCES:
+                case BITMAP:
                     identName = lexer.stringVal();
                     lexer.nextToken();
                     break;
@@ -4352,6 +4357,12 @@ public class SQLExprParser extends SQLParser {
         final long typeNameHashCode = typeExpr.nameHashCode64();
         StringBuilder typeName = new StringBuilder(typeExpr.toString());
 
+
+        if (dbType == DbType.starrocks && lexer.token == Token.BITMAP_UNION) {
+            typeName.append(' ').append(lexer.stringVal());
+            lexer.nextToken();
+        }
+
         if (typeNameHashCode == FnvHash.Constants.LONG
                 && lexer.identifierEquals(FnvHash.Constants.BYTE)
                 && DbType.mysql == dbType) {
@@ -4927,8 +4938,60 @@ public class SQLExprParser extends SQLParser {
                         accept(Token.RPAREN);
                     }
                     return parseColumnRest(column);
+                } else if (this.dbType == DbType.starrocks && org.apache.commons.lang3.StringUtils.containsAny(org.apache.commons.lang3.StringUtils.upperCase(lexer.stringVal()), STARROCKS_AGG_TYPE)) {
+                    lexer.nextToken();
+                    return parseColumnRest(column);
                 }
                 break;
+            case USING:
+                lexer.nextToken();
+                if (lexer.token != Token.BITMAP) {
+                    setErrorEndPos(lexer.pos());
+                    printError(lexer.token);
+                }
+                lexer.nextToken();
+                return parseColumnRest(column);
+            case SUM:
+            case AVG:
+            case COUNT:
+            case MAX:
+            case MIN:
+            case ANY_VALUE:
+            case APPROX_COUNT_DISTINCT:
+            case APPROX_TOP_K:
+            case BITMAP:
+            case CORR:
+            case COUNT_IF:
+            case COVAR_POP:
+            case COVAR_SAMP:
+            case GROUP_CONCAT:
+            case GROUPING:
+            case GROUPING_ID:
+            case HLL_RAW_AGG:
+            case HLL_UNION:
+            case HLL_UNION_AGG:
+            case MAX_BY:
+            case MIN_BY:
+            case MULTI_DISTINCT_COUNT:
+            case MULTI_DISTINCT_SUM:
+            case PERCENTILE_APPROX:
+            case PERCENTILE_CONT:
+            case PERCENTILE_DISC:
+            case RETENTION:
+            case STD:
+            case STDDEV:
+            case STDDEV_POP:
+            case STDDEV_SAMP:
+            case VAR_SAMP:
+            case VARIANCE_SAMP:
+            case VARIANCE:
+            case VAR_POP:
+            case VARIANCE_POP:
+            case WINDOW_FUNNEL:
+            case PERCENTILE_UNION: {
+                lexer.nextToken();
+                return parseColumnRest(column);
+            }
             case COMMENT:
                 lexer.nextToken();
 

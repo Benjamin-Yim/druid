@@ -550,6 +550,53 @@ public class StarrocksExprParser extends SQLExprParser {
         }
     }
 
+
+    public SQLPartitionValue parsePartitionValues() {
+        if (lexer.token() != Token.VALUES) {
+            return null;
+        }
+        lexer.nextToken();
+
+        SQLPartitionValue values = null;
+
+        if (lexer.token() == Token.IN) {
+            lexer.nextToken();
+            values = new SQLPartitionValue(SQLPartitionValue.Operator.In);
+
+            accept(Token.LPAREN);
+            this.exprList(values.getItems(), values);
+            accept(Token.RPAREN);
+        } else if (lexer.identifierEquals(FnvHash.Constants.LESS)) {
+            lexer.nextToken();
+            acceptIdentifier("THAN");
+
+            values = new SQLPartitionValue(SQLPartitionValue.Operator.LessThan);
+
+            if (lexer.identifierEquals(FnvHash.Constants.MAXVALUE)) {
+                SQLIdentifierExpr maxValue = new SQLIdentifierExpr(lexer.stringVal());
+                lexer.nextToken();
+                maxValue.setParent(values);
+                values.addItem(maxValue);
+            } else {
+                accept(Token.LPAREN);
+                this.exprList(values.getItems(), values);
+                accept(Token.RPAREN);
+            }
+        } else if (lexer.token() == Token.LPAREN) {
+            values = new SQLPartitionValue(SQLPartitionValue.Operator.List);
+            lexer.nextToken();
+            this.exprList(values.getItems(), values);
+            accept(Token.RPAREN);
+        } else if (lexer.token() == Token.LBRACKET) {
+            values = new SQLPartitionValue(SQLPartitionValue.Operator.List);
+            lexer.nextToken();
+            this.exprList(values.getItems(), values);
+            accept(Token.RPAREN);
+        }
+        return values;
+    }
+
+
     protected SQLPartition parsePartition() {
         accept(Token.PARTITION);
         SQLPartition partition = new SQLPartition();

@@ -24,11 +24,12 @@ import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
 import com.alibaba.druid.sql.dialect.hive.visitor.HiveSchemaStatVisitor;
 import com.alibaba.druid.sql.dialect.starrocks.ast.*;
 import com.alibaba.druid.sql.repository.SchemaRepository;
+import com.alibaba.druid.sql.visitor.SchemaStatVisitor;
 import com.alibaba.druid.stat.TableStat;
 
 import java.util.List;
 
-public class StarrocksSchemaStatVisitor extends HiveSchemaStatVisitor implements StarrocksASTVisitor {
+public class StarrocksSchemaStatVisitor extends SchemaStatVisitor implements StarrocksASTVisitor {
     public StarrocksSchemaStatVisitor() {
         super(DbType.starrocks);
     }

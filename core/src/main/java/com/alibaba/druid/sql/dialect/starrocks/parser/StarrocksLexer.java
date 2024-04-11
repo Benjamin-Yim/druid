@@ -32,6 +32,7 @@ public class StarrocksLexer extends Lexer {
 
         map.putAll(Keywords.DEFAULT_KEYWORDS.getKeywords());
 
+
         map.put("SHOW", Token.SHOW);
         map.put("PARTITION", Token.PARTITION);
         map.put("PARTITIONED", Token.PARTITIONED);
@@ -53,6 +54,11 @@ public class StarrocksLexer extends Lexer {
         map.put("PRIMARY", Token.PRIMARY);
         map.put("DISTRIBUTED", Token.DISTRIBUTED);
         map.put("PROPERTIES", Token.PROPERTIES);
+//        map.put("SUM", Token.SUM);
+//        map.put("AVG", Token.AVG);
+//        map.put("COUNT", Token.COUNT);
+//        map.put("MAX", Token.MAX);
+//        map.put("MIN", Token.MIN);
         map.put("ANY_VALUE", Token.ANY_VALUE);
         map.put("APPROX_COUNT_DISTINCT", Token.APPROX_COUNT_DISTINCT);
         map.put("APPROX_TOP_K", Token.APPROX_TOP_K);
@@ -89,8 +95,6 @@ public class StarrocksLexer extends Lexer {
         map.put("INDEX", Token.INDEX);
         map.put("USING", Token.USING);
         map.put("BITMAP_UNION", Token.BITMAP_UNION);
-        map.put("LATERAL", Token.LATERAL);
-
         DEFAULT_ODPS_KEYWORDS = new Keywords(map);
     }
 
