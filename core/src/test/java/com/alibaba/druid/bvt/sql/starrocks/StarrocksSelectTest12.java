@@ -33,7 +33,7 @@ public class StarrocksSelectTest12 extends TestCase {
                 "CROSS JOIN LATERAL EXPLODE(SPLIT(concat(',', '1', '2', '3'), ',')) t AS sp;", SQLUtils.formatStarrocks(sql));
         Assert.assertEquals("select name, sp"
                 + "\nfrom abc"
-                + "\nCROSS JOIN LATERAL explode(split(concat(',', '1', '2', '3'), ',')) t as sp;", SQLUtils.formatStarrocks(sql, SQLUtils.DEFAULT_LCASE_FORMAT_OPTION));
+                + "\ncross join lateral explode(split(concat(',', '1', '2', '3'), ',')) t as sp;", SQLUtils.formatStarrocks(sql, SQLUtils.DEFAULT_LCASE_FORMAT_OPTION));
 
         List<SQLStatement> statementList = SQLUtils.parseStatements(sql, JdbcConstants.STARROCKS);
         SQLStatement stmt = statementList.get(0);
@@ -51,7 +51,7 @@ public class StarrocksSelectTest12 extends TestCase {
 //      System.out.println("orderBy : " + visitor.getOrderByColumns());
 
         Assert.assertEquals(1, visitor.getTables().size());
-        Assert.assertEquals(1, visitor.getColumns().size());
+        Assert.assertEquals(2, visitor.getColumns().size());
         Assert.assertEquals(0, visitor.getConditions().size());
 
         Assert.assertTrue(visitor.getColumns().contains(new Column("abc", "name")));
