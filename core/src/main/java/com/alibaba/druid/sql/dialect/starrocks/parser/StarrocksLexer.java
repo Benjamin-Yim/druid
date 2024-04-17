@@ -25,7 +25,7 @@ import static com.alibaba.druid.sql.parser.CharTypes.*;
 import static com.alibaba.druid.sql.parser.LayoutCharacters.EOI;
 
 public class StarrocksLexer extends Lexer {
-    public static final Keywords DEFAULT_ODPS_KEYWORDS;
+    public static final Keywords DEFAULT_STARROCKS_KEYWORDS;
 
     static {
         Map<String, Token> map = new HashMap<String, Token>();
@@ -95,7 +95,7 @@ public class StarrocksLexer extends Lexer {
         map.put("INDEX", Token.INDEX);
         map.put("USING", Token.USING);
         map.put("BITMAP_UNION", Token.BITMAP_UNION);
-        DEFAULT_ODPS_KEYWORDS = new Keywords(map);
+        DEFAULT_STARROCKS_KEYWORDS = new Keywords(map);
     }
 
     public StarrocksLexer(String input, SQLParserFeature... features) {
@@ -104,7 +104,7 @@ public class StarrocksLexer extends Lexer {
         init();
 
         dbType = DbType.starrocks;
-        super.keywords = DEFAULT_ODPS_KEYWORDS;
+        super.keywords = DEFAULT_STARROCKS_KEYWORDS;
         this.skipComment = true;
         this.keepComments = false;
 
@@ -121,7 +121,7 @@ public class StarrocksLexer extends Lexer {
         dbType = DbType.starrocks;
         this.skipComment = skipComment;
         this.keepComments = keepComments;
-        super.keywords = DEFAULT_ODPS_KEYWORDS;
+        super.keywords = DEFAULT_STARROCKS_KEYWORDS;
     }
 
     public StarrocksLexer(String input, CommentHandler commentHandler) {
@@ -130,7 +130,7 @@ public class StarrocksLexer extends Lexer {
         init();
 
         dbType = DbType.starrocks;
-        super.keywords = DEFAULT_ODPS_KEYWORDS;
+        super.keywords = DEFAULT_STARROCKS_KEYWORDS;
     }
 
     private void init() {
@@ -148,8 +148,147 @@ public class StarrocksLexer extends Lexer {
         }
     }
 
+    protected final void scanStarrocksComment() {
+        if (ch != '/' && ch != '-') {
+            throw new IllegalStateException();
+        }
+
+        Token lastToken = this.token;
+
+        mark = pos;
+        bufPos = 0;
+        scanChar();
+
+        if (ch == ' ') {
+            mark = pos;
+            bufPos = 0;
+            scanChar();
+        }
+
+        // /*+ */
+        if (ch == '*') {
+            scanChar();
+            bufPos++;
+
+            while (ch == ' ') {
+                scanChar();
+                bufPos++;
+            }
+
+            boolean isHint = false;
+            int startHintSp = bufPos + 1;
+            if (ch == '+') {
+                isHint = true;
+                scanChar();
+                bufPos++;
+            }
+
+            for (; ; ) {
+                if (ch == '*') {
+                    if (charAt(pos + 1) == '/') {
+                        bufPos += 2;
+                        scanChar();
+                        scanChar();
+                        break;
+                    } else if (isWhitespace(charAt(pos + 1))) {
+                        int i = 2;
+                        for (; i < 1024 * 1024; ++i) {
+                            if (!isWhitespace(charAt(pos + i))) {
+                                break;
+                            }
+                        }
+                        if (charAt(pos + i) == '/') {
+                            bufPos += 2;
+                            pos += (i + 1);
+                            ch = charAt(pos);
+                            break;
+                        }
+                    }
+                }
+
+                scanChar();
+                if (ch == EOI) {
+                    break;
+                }
+                bufPos++;
+            }
+
+            if (isHint) {
+                stringVal = subString(mark + startHintSp, (bufPos - startHintSp) - 1);
+                token = Token.HINT;
+            } else {
+                stringVal = subString(mark, bufPos + 1);
+                token = Token.MULTI_LINE_COMMENT;
+                commentCount++;
+                if (keepComments) {
+                    addComment(stringVal);
+                }
+            }
+
+            if (commentHandler != null && commentHandler.handle(lastToken, stringVal)) {
+                return;
+            }
+
+            if (token != Token.HINT && !isAllowComment()) {
+                throw new NotAllowCommentException();
+            }
+
+            return;
+        }
+
+        if (!isAllowComment()) {
+            throw new NotAllowCommentException();
+        }
+
+        if (ch == '/' || ch == '-') {
+            scanChar();
+            bufPos++;
+
+            for (; ; ) {
+                if (ch == '\r') {
+                    if (charAt(pos + 1) == '\n') {
+                        line++;
+                        bufPos += 2;
+                        scanChar();
+                        break;
+                    }
+                    bufPos++;
+                    break;
+                } else if (ch == EOI) {
+                    if (pos >= text.length()) {
+                        break;
+                    }
+                }
+
+                if (ch == '\n') {
+                    line++;
+                    scanChar();
+                    bufPos++;
+                    break;
+                }
+
+                scanChar();
+                bufPos++;
+            }
+
+            stringVal = subString(mark, ch != EOI ? bufPos : bufPos + 1);
+            token = Token.LINE_COMMENT;
+            commentCount++;
+            if (keepComments) {
+                addComment(stringVal);
+            }
+            endOfComment = isEOF();
+
+            if (commentHandler != null && commentHandler.handle(lastToken, stringVal)) {
+                return;
+            }
+
+            return;
+        }
+    }
+
     public void scanComment() {
-        scanHiveComment();
+        scanStarrocksComment();
     }
 
     public void scanIdentifier() {

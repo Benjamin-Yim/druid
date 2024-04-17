@@ -19,7 +19,7 @@ import com.alibaba.druid.sql.ast.*;
 import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
 import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
 import com.alibaba.druid.sql.ast.statement.*;
-import com.alibaba.druid.sql.dialect.hive.ast.HiveInputOutputFormat;
+import com.alibaba.druid.sql.dialect.starrocks.ast.StarrocksInputOutputFormat;
 import com.alibaba.druid.sql.dialect.starrocks.ast.StarrocksCreateTableStatement;
 import com.alibaba.druid.sql.parser.ParserException;
 import com.alibaba.druid.sql.parser.SQLCreateTableParser;
@@ -88,7 +88,7 @@ public class StarrocksCreateTableParser extends SQLCreateTableParser {
                 accept(Token.AS);
 
                 if (lexer.identifierEquals(FnvHash.Constants.INPUTFORMAT)) {
-                    HiveInputOutputFormat format = new HiveInputOutputFormat();
+                    StarrocksInputOutputFormat format = new StarrocksInputOutputFormat();
                     lexer.nextToken();
                     format.setInput(this.exprParser.primary());
 
@@ -494,7 +494,7 @@ public class StarrocksCreateTableParser extends SQLCreateTableParser {
                     lexer.nextToken();
 
                     if (lexer.identifierEquals(FnvHash.Constants.INPUTFORMAT)) {
-                        HiveInputOutputFormat format = new HiveInputOutputFormat();
+                        StarrocksInputOutputFormat format = new StarrocksInputOutputFormat();
                         lexer.nextToken();
                         format.setInput(this.exprParser.primary());
 

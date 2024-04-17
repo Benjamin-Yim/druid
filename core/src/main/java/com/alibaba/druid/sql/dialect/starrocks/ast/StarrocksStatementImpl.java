@@ -29,6 +29,6 @@ public abstract class StarrocksStatementImpl extends SQLStatementImpl {
     protected abstract void accept0(StarrocksASTVisitor visitor);
 
     public String toString() {
-        return SQLUtils.toOdpsString(this);
+        return SQLUtils.toStarrocksString(this);
     }
 }

@@ -15,7 +15,7 @@
  */
 package com.alibaba.druid.sql.dialect.starrocks.visitor;
 
-import com.alibaba.druid.sql.dialect.hive.visitor.HiveASTVisitorAdapter;
+import com.alibaba.druid.sql.visitor.SQLASTVisitorAdapter;
 
-public class StarrocksASTVisitorAdapter extends HiveASTVisitorAdapter implements StarrocksASTVisitor {
+public class StarrocksASTVisitorAdapter extends SQLASTVisitorAdapter implements StarrocksASTVisitor {
 }

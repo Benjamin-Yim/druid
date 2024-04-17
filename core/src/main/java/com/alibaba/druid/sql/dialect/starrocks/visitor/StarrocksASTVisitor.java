@@ -20,11 +20,33 @@ package com.alibaba.druid.sql.dialect.starrocks.visitor;
 import com.alibaba.druid.sql.ast.statement.SQLCreateTableStatement;
 import com.alibaba.druid.sql.ast.statement.SQLGrantStatement;
 import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
-import com.alibaba.druid.sql.dialect.hive.visitor.HiveASTVisitor;
 import com.alibaba.druid.sql.dialect.starrocks.ast.*;
+import com.alibaba.druid.sql.dialect.starrocks.stmt.StarrocksLoadDataStatement;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 
 public interface StarrocksASTVisitor extends SQLASTVisitor {
+    default boolean visit(StarrocksInsert x) {
+        return true;
+    }
+
+    default void endVisit(StarrocksInsert x) {
+    }
+
+    default boolean visit(StarrocksMultiInsertStatement x) {
+        return true;
+    }
+
+    default void endVisit(StarrocksMultiInsertStatement x) {
+    }
+
+    default boolean visit(StarrocksLoadDataStatement x) {
+        return true;
+    }
+
+    default void endVisit(StarrocksLoadDataStatement x) {
+    }
+
+
     default void endVisit(StarrocksCreateTableStatement x) {
         endVisit((SQLCreateTableStatement) x);
     }

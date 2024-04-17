@@ -29,20 +29,20 @@ public class StarrocksSelectTest36 extends TestCase {
         String sql = "select *\n" +
                 "from (\n" +
                 "\tselect 1\n" +
-                ") \n" +
+                ") A\n" +
                 "union all\n" +
                 "select 2;";//
         assertEquals("SELECT *\n" +
                 "FROM (\n" +
                 "\tSELECT 1\n" +
-                ")\n" +
+                ") A\n" +
                 "UNION ALL\n" +
                 "SELECT 2;", SQLUtils.formatStarrocks(sql));
 
         assertEquals("select *\n" +
                 "from (\n" +
                 "\tselect 1\n" +
-                ")\n" +
+                ") A\n" +
                 "union all\n" +
                 "select 2;", SQLUtils.formatStarrocks(sql, SQLUtils.DEFAULT_LCASE_FORMAT_OPTION));
 

@@ -19,8 +19,8 @@ import com.alibaba.druid.DbType;
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.SQLName;
 import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
+import com.alibaba.druid.sql.ast.statement.SQLCreateTableStatement;
 import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
-import com.alibaba.druid.sql.dialect.hive.stmt.HiveCreateTableStatement;
 import com.alibaba.druid.sql.dialect.starrocks.visitor.StarrocksASTVisitor;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 
@@ -29,10 +29,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class StarrocksCreateTableStatement extends HiveCreateTableStatement {
+public class StarrocksCreateTableStatement extends SQLCreateTableStatement {
     protected final List<SQLExpr> withSerdeproperties = new ArrayList<SQLExpr>();
     protected SQLExpr lifecycle;
     protected SQLExpr storedBy;
+    protected SQLExpr using;
+    protected SQLExpr intoBuckets;
     public List<SQLName> distributeBy = new ArrayList<>();
     public Map<String, String> properties = new HashMap<>();
 
@@ -97,6 +99,8 @@ public class StarrocksCreateTableStatement extends HiveCreateTableStatement {
         acceptChild(v, withSerdeproperties);
         acceptChild(v, lifecycle);
         acceptChild(v, storedBy);
+        acceptChild(v, intoBuckets);
+
     }
 
     public SQLExpr getStoredBy() {
@@ -136,5 +140,25 @@ public class StarrocksCreateTableStatement extends HiveCreateTableStatement {
 
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
+    }
+
+
+    public SQLExpr getUsing() {
+        return using;
+    }
+
+    public void setUsing(SQLExpr x) {
+        if (x != null) {
+            x.setParent(this);
+        }
+        this.using = x;
+    }
+
+    public SQLExpr getIntoBuckets() {
+        return intoBuckets;
+    }
+
+    public void setIntoBuckets(SQLExpr intoBuckets) {
+        this.intoBuckets = intoBuckets;
     }
 }

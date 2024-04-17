@@ -22,16 +22,16 @@ import com.alibaba.druid.sql.ast.expr.SQLDecimalExpr;
 import com.alibaba.druid.sql.ast.expr.SQLMethodInvokeExpr;
 import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.sql.ast.statement.SQLJoinTableSource.JoinType;
-import com.alibaba.druid.sql.dialect.hive.stmt.HiveLoadDataStatement;
-import com.alibaba.druid.sql.dialect.hive.visitor.HiveOutputVisitor;
+import com.alibaba.druid.sql.dialect.starrocks.stmt.StarrocksLoadDataStatement;
 import com.alibaba.druid.sql.dialect.starrocks.ast.*;
+import com.alibaba.druid.sql.visitor.SQLASTOutputVisitor;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class StarrocksOutputVisitor extends HiveOutputVisitor implements StarrocksASTVisitor {
+public class StarrocksOutputVisitor extends SQLASTOutputVisitor implements StarrocksASTVisitor {
     private Set<String> builtInFunctions = new HashSet<String>();
 
     {
@@ -54,6 +54,47 @@ public class StarrocksOutputVisitor extends HiveOutputVisitor implements Starroc
     public StarrocksOutputVisitor(StringBuilder appender) {
         super(appender, DbType.starrocks);
     }
+
+
+    protected void printTblProperties(StarrocksCreateTableStatement x) {
+        List<SQLAssignItem> tblProperties = x.getTblProperties();
+        if (tblProperties.size() > 0) {
+            println();
+            print0(ucase ? "TBLPROPERTIES (" : "tblproperties (");
+            incrementIndent();
+            println();
+            int i = 0;
+            for (SQLAssignItem property : tblProperties) {
+                if (i != 0) {
+                    print(",");
+                    println();
+                }
+                String key = property.getTarget().toString();
+
+                boolean unquote = false;
+                char c0;
+                if (key.length() > 0 && (c0 = key.charAt(0)) != '"' && c0 != '`' && c0 != '\'') {
+                    unquote = true;
+                }
+
+                if (unquote) {
+                    print('\'');
+                }
+                print0(key);
+                if (unquote) {
+                    print('\'');
+                }
+
+                print0(" = ");
+                property.getValue().accept(this);
+                ++i;
+            }
+            decrementIndent();
+            println();
+            print(')');
+        }
+    }
+
 
     public boolean visit(StarrocksCreateTableStatement x) {
         List<SQLCommentHint> headHints = x.getHeadHintsDirect();
@@ -1032,9 +1073,8 @@ public class StarrocksOutputVisitor extends HiveOutputVisitor implements Starroc
 
         return false;
     }
-
-    @Override
-    public boolean visit(HiveLoadDataStatement x) {
+    
+    public boolean visit(StarrocksLoadDataStatement x) {
         print0(ucase ? "LOAD " : "load ");
 
         if (x.isOverwrite()) {
