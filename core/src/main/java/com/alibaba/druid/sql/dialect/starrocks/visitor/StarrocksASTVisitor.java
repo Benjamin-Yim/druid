@@ -22,8 +22,9 @@ import com.alibaba.druid.sql.ast.statement.SQLGrantStatement;
 import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
 import com.alibaba.druid.sql.dialect.hive.visitor.HiveASTVisitor;
 import com.alibaba.druid.sql.dialect.starrocks.ast.*;
+import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 
-public interface StarrocksASTVisitor extends HiveASTVisitor {
+public interface StarrocksASTVisitor extends SQLASTVisitor {
     default void endVisit(StarrocksCreateTableStatement x) {
         endVisit((SQLCreateTableStatement) x);
     }

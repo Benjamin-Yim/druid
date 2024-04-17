@@ -1558,7 +1558,7 @@ public class SQLSelectParser extends SQLParser {
                     lexer.nextToken();
                     if (lexer.token == Token.JOIN) {
                         lexer.nextToken();
-                        if (dbType == DbType.starrocks && lexer.token == Token.LATERAL) {
+                        if (dbType == DbType.starrocks && lexer.token == Token.IDENTIFIER) {
                             lexer.nextToken();
                             joinType = SQLJoinTableSource.JoinType.CROSS_JOIN_LATERAL;
                         } else {

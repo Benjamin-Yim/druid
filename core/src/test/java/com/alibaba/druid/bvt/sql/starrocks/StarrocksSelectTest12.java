@@ -30,10 +30,10 @@ public class StarrocksSelectTest12 extends TestCase {
         String sql = "select name, sp from abc cross join lateral explode(split(concat(',','1','2','3'),',')) t as sp;";//
         Assert.assertEquals("SELECT name, sp\n" +
                 "FROM abc\n" +
-                "\tCROSS JOIN LATERAL EXPLODE(SPLIT(concat(',', '1', '2', '3'), ',')) t AS sp;", SQLUtils.formatStarrocks(sql));
+                "CROSS JOIN LATERAL EXPLODE(SPLIT(concat(',', '1', '2', '3'), ',')) t AS sp;", SQLUtils.formatStarrocks(sql));
         Assert.assertEquals("select name, sp"
                 + "\nfrom abc"
-                + "\n\tCROSS JOIN LATERAL explode(split(concat(',', '1', '2', '3'), ',')) t as sp;", SQLUtils.formatStarrocks(sql, SQLUtils.DEFAULT_LCASE_FORMAT_OPTION));
+                + "\nCROSS JOIN LATERAL explode(split(concat(',', '1', '2', '3'), ',')) t as sp;", SQLUtils.formatStarrocks(sql, SQLUtils.DEFAULT_LCASE_FORMAT_OPTION));
 
         List<SQLStatement> statementList = SQLUtils.parseStatements(sql, JdbcConstants.STARROCKS);
         SQLStatement stmt = statementList.get(0);

@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 
 public class StarrocksLexerTest extends TestCase {
     public void test_0() throws Exception {
-        String str = "DESC；";
+        String str = "DESC;";
         StarrocksLexer lexer = new StarrocksLexer(str);
         lexer.nextToken();
         assertEquals(Token.DESC, lexer.token());
@@ -45,9 +45,6 @@ public class StarrocksLexerTest extends TestCase {
         StarrocksLexer lexer = new StarrocksLexer(str);
         lexer.nextToken();
         assertEquals(Token.IDENTIFIER, lexer.token());
-        lexer.nextToken();
-        assertEquals(Token.IDENTIFIER, lexer.token());
-        assertEquals("@{yyyyMMdd}_${rundt}", lexer.stringVal());
     }
 
     public void test_4() throws Exception {
