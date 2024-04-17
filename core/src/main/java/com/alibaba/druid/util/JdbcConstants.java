@@ -162,4 +162,8 @@ public interface JdbcConstants {
     DbType STARROCKS = DbType.starrocks;
 
     String STARROCKS_DRIVER = "com.mysql.cj.jdbc.Driver";
+
+    String GOLDENDB_DRIVER = "com.goldendb.jdbc.Driver";
+
+    String GBASE8S_DRIVER = "com.gbasedbt.jdbc.Driver";
 }

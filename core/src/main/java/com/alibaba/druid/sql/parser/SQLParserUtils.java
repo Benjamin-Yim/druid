@@ -119,6 +119,8 @@ public class SQLParserUtils {
             case mysql:
             case tidb:
             case mariadb:
+            case goldendb:
+            case oceanbase:
             case drds: {
                 return new MySqlStatementParser(sql, features);
             }
@@ -131,6 +133,7 @@ public class SQLParserUtils {
             case postgresql:
             case greenplum:
             case edb:
+            case gaussdb:
                 return new PGSQLStatementParser(sql, features);
             case sqlserver:
             case jtds:
